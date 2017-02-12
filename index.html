@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script>
+      var sinceTime = (new Date(Date.now())).getTime();
+      var channel = "foo";
+
+      (function poll() {
+        var pollUrl = "/subscribe?channel=" + channel + "&since_time=" + sinceTime;
+        var successDelay = 10;  // 10 ms
+        var errorDelay = 3000;  // 3 sec
+        $.ajax({
+          url: pollUrl,
+          success: function(data) {
+            $("<li></li>").html(data).appendTo($("#log"));
+            setTimeout(poll, successDelay);
+          },
+          error: function(data) {
+            console.log("Error in ajax request--trying again shortly...");
+            setTimeout(poll, errorDelay);
+          }
+        });
+      })()
+    </script>
+  </head>
+
+  <body>
+    <h1>Longpolling the server</h1>
+    <ul id="log"></ul>
+  </body>
+</html>
