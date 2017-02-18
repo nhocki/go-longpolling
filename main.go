@@ -6,10 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
+	"os"
+
 	"./models"
+	"./redis"
 	"./strategies"
 )
 
@@ -94,9 +96,14 @@ func main() {
 		serverAddress = os.Args[1]
 	}
 
+	strategy, err := strategies.NewRedisStrategy(redis.ConfigFromEnv())
+	if err != nil {
+		panic(err)
+	}
+
 	s := server{
 		log:      models.StdLogger,
-		Strategy: strategies.NewStdBasic(),
+		Strategy: strategy,
 		Address:  serverAddress,
 	}
 
