@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"./models"
@@ -14,9 +15,10 @@ import (
 
 // Strategy is an interface for pub/sub strategies
 type Strategy interface {
+	Setup()
 	Add(s *models.Connection, channel string) error
 	Remove(uuid, channel string) error
-	Publish(channel string, r io.ReadCloser) error
+	Publish(channel string, r io.Reader) error
 }
 
 type server struct {
@@ -80,6 +82,7 @@ func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) setup() {
+	s.Strategy.Setup()
 	http.HandleFunc("/", s.indexHandler)
 	http.HandleFunc("/subscribe", s.subscribeHandler)
 	http.HandleFunc("/publish", s.publishHanlder)
@@ -87,6 +90,9 @@ func (s *server) setup() {
 
 func main() {
 	var serverAddress = ":8080"
+	if len(os.Args) == 2 {
+		serverAddress = os.Args[1]
+	}
 
 	s := server{
 		log:      models.StdLogger,

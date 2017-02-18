@@ -23,6 +23,11 @@ func NewStdBasic() *Basic {
 	}
 }
 
+// Setup does nothing
+func (b *Basic) Setup() {
+	// no-op
+}
+
 // Add subscribes a subscription to it's channel
 func (b *Basic) Add(c *models.Connection, channel string) error {
 	b.Lock()
@@ -57,12 +62,11 @@ func (b *Basic) Remove(uuid, channel string) error {
 }
 
 // Publish sends the messages to the users
-func (b *Basic) Publish(channel string, r io.ReadCloser) error {
+func (b *Basic) Publish(channel string, r io.Reader) error {
 	msg, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
-	defer r.Close()
 
 	b.log.Printf("Publishing to channel %s: %d\n", channel, len(b.subs[channel]))
 	for _, conn := range b.subs[channel] {
@@ -70,4 +74,10 @@ func (b *Basic) Publish(channel string, r io.ReadCloser) error {
 		conn.C <- msg
 	}
 	return nil
+}
+
+func (b *Basic) totalSubs(channel string) int {
+	b.Lock()
+	defer b.Unlock()
+	return len(b.subs[channel])
 }
