@@ -14,16 +14,8 @@ import (
 	"./strategies"
 )
 
-// Strategy is an interface for pub/sub strategies
-type Strategy interface {
-	Setup()
-	Add(s *models.Connection, channel string) error
-	Remove(uuid, channel string) error
-	Publish(channel string, r io.Reader) error
-}
-
 type server struct {
-	Strategy
+	strategies.Strategy
 	log     models.Logger
 	Address string
 }
@@ -70,7 +62,7 @@ func (s *server) publishHanlder(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Message sent!")))
 }
 
-// publishHanlder is the HTTP handler publish messages to a channel
+// indexHandler will serve the index.html file
 func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadFile("index.html")
 	if err != nil {

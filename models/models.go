@@ -1,6 +1,7 @@
 package models
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -28,9 +29,13 @@ func NewConnection() *Connection {
 	}
 }
 
-// StdLogger logs to STDOUT
-var StdLogger Logger
+// Default loggers.
+var (
+	StdLogger  Logger
+	NullLogger Logger
+)
 
 func init() {
 	StdLogger = log.New(os.Stdout, "", log.LstdFlags)
+	NullLogger = log.New(ioutil.Discard, "", log.LstdFlags)
 }

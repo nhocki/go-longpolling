@@ -1,10 +1,8 @@
 package redis
 
 import (
-	"log"
 	"net/url"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -21,16 +19,12 @@ const (
 // Config holds the redis configuration
 type Config struct {
 	ServerURL, Auth string
-	Database        string
-	PoolSize        int
 }
 
 // ConfigFromEnv returns a config objects that reads everything from the
 // environment and adds some sensible defaults.
 func ConfigFromEnv() *Config {
-	config := &Config{
-		Database: os.Getenv("REDIS_DATABASE"),
-	}
+	config := &Config{}
 
 	redisURL := os.Getenv("REDIS_URL")
 	if redisURL == "" {
@@ -49,13 +43,5 @@ func ConfigFromEnv() *Config {
 		config.Auth, _ = srvURL.User.Password()
 	}
 
-	redisConnEnv := os.Getenv("REDIS_POOL_SIZE")
-	if redisConnEnv != "" {
-		config.PoolSize, err = strconv.Atoi(redisConnEnv)
-		if err != nil {
-			log.Printf("[ERROR] Could not parse Redis pool size: %s. Using default size (%d)", redisConnEnv, defaultRedisConns)
-			config.PoolSize = defaultRedisConns
-		}
-	}
 	return config
 }
