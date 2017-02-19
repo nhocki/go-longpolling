@@ -48,3 +48,35 @@ func TestSingleRedisStrategy(t *testing.T) {
 	assert.Equal(t, 0, strategy.TotalSubs("events"))
 	assert.Equal(t, 0, strategy.TotalSubs("messages"))
 }
+
+func TestMultipleRedisStrategy(t *testing.T) {
+	publisher, err := NewRedisStrategy(redis.ConfigFromEnv())
+	assert.NoError(t, err)
+
+	subscriber, err := NewRedisStrategy(redis.ConfigFromEnv())
+	assert.NoError(t, err)
+
+	// Start subscriber listener
+	subscriber.Setup()
+
+	events := models.NewConnection()
+	messages := models.NewConnection()
+
+	// Add connections to subscriber
+	assert.NoError(t, subscriber.Add(events, "events"))
+	assert.NoError(t, subscriber.Add(messages, "messages"))
+
+	// Send messages to publisher. Connections should still get the messages.
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	go assertEvent(t, events, wg)
+	go assertNoEvent(t, messages, wg)
+	publisher.Publish("events", bytes.NewReader([]byte(`Hello, World!`)))
+	wg.Wait()
+
+	wg.Add(2)
+	go assertEvent(t, messages, wg)
+	go assertNoEvent(t, events, wg)
+	publisher.Publish("messages", bytes.NewReader([]byte(`Hello, World!`)))
+	wg.Wait()
+}
