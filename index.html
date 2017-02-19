@@ -2,30 +2,81 @@
   <head>
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script>
-      var sinceTime = (new Date(Date.now())).getTime();
-      var channel = "foo";
+      function Poll(channel) {
+        this.channel = channel;
+        this.sinceTime = (new Date(Date.now())).getTime();
+        this.successDelay = 10;  // 10 ms
+        this.errorDelay = 3000;  // 3 sec
+        this.errors = 0;
 
-      (function poll() {
-        var pollUrl = "/subscribe?channel=" + channel + "&since_time=" + sinceTime;
-        var successDelay = 10;  // 10 ms
-        var errorDelay = 3000;  // 3 sec
-        $.ajax({
-          url: pollUrl,
-          success: function(data) {
-            $("<li></li>").html(data).appendTo($("#log"));
-            setTimeout(poll, successDelay);
-          },
-          error: function(data) {
-            console.log("Error in ajax request--trying again shortly...");
-            setTimeout(poll, errorDelay);
-          }
-        });
-      })()
+        this.$el = $("#template").clone().attr("id", this.sinceTime);
+        this.$el.find(".channel").html("Polling channel " + channel)
+
+        this.init = function() {
+          this.$el.appendTo($("#polls"))
+          this.poll()
+        }
+
+        this.poll = function() {
+          var _this = this;
+          pollUrl = "/subscribe?channel=" + _this.channel + "&since_time=" + _this.sinceTime;
+          $.ajax({
+            url: pollUrl,
+            success: function(data) {
+              $("<li></li>").html(data).appendTo(_this.$el.find(".log"));
+              setTimeout(function() { _this.poll() }, _this.successDelay);
+            },
+            error: function(data) {
+              _this.errors += 1;
+              if (_this.errors < 3) {
+                console.log("Error in ajax request--trying again shortly...");
+                setTimeout(function() { _this.poll() }, _this.errorDelay);
+              }else {
+                console.error("Server is down. Not retrying anymore!")
+              }
+            }
+          })
+        }
+      }
+
+      jQuery(function($){
+        $("#sub").on('click', function(){
+          new Poll($("#channel").val()).init();
+          $("#channel").val("");
+          return false;
+        })
+      })
     </script>
+
+    <style>
+      .poll {
+        border: 1px dotted #CCC;
+        width: 350px;
+        display: inline-block;
+        margin: 5px;
+        padding: 3px;
+      }
+
+      #template {
+        visibility: hidden;
+      }
+
+      #polls {
+        border: 1px solid black;
+        margin: 5px;
+        padding: 10px;
+      }
+    </style>
   </head>
 
   <body>
     <h1>Longpolling the server</h1>
-    <ul id="log"></ul>
+    <div id="form">
+      Channel: <input type="text" id="channel"> <input type="submit" value="Subscribe!" id="sub">
+      <br />  <br />
+    </div>
+    <div id="polls"></div>
+    <div class="poll" id='template'><p class='channel'></p><ul class="log"></ul></div>
   </body>
+
 </html>
