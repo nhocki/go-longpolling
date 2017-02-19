@@ -4,6 +4,8 @@ import (
 	"log"
 	"os"
 
+	"io/ioutil"
+
 	uuid "github.com/satori/go.uuid"
 )
 
@@ -28,9 +30,13 @@ func NewConnection() *Connection {
 	}
 }
 
-// StdLogger logs to STDOUT
-var StdLogger Logger
+// Default loggers.
+var (
+	StdLogger  Logger
+	NullLogger Logger
+)
 
 func init() {
 	StdLogger = log.New(os.Stdout, "", log.LstdFlags)
+	NullLogger = log.New(ioutil.Discard, "", log.LstdFlags)
 }
