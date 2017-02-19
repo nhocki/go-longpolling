@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"sync"
 
-	"../models"
+	"github.com/nhocki/go-longpolling/models"
 )
 
 // Basic uses an array to store users

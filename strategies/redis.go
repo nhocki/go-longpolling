@@ -3,12 +3,11 @@ package strategies
 import (
 	"bytes"
 	"io"
+	"io/ioutil"
 	"log"
 
-	"../models"
-	"../redis"
-
-	"io/ioutil"
+	"github.com/nhocki/go-longpolling/models"
+	"github.com/nhocki/go-longpolling/redis"
 
 	client "github.com/garyburd/redigo/redis"
 )

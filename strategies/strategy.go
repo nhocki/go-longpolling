@@ -3,7 +3,7 @@ package strategies
 import (
 	"io"
 
-	"../models"
+	"github.com/nhocki/go-longpolling/models"
 )
 
 // Strategy is an interface for pub/sub strategies

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"../models"
+	"github.com/nhocki/go-longpolling/models"
 )
 
 func assertEvent(t *testing.T, c *models.Connection, wg *sync.WaitGroup) {

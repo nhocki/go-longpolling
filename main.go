@@ -6,12 +6,11 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
-	"os"
-
-	"./models"
-	"./strategies"
+	"github.com/nhocki/go-longpolling/models"
+	"github.com/nhocki/go-longpolling/strategies"
 )
 
 type server struct {

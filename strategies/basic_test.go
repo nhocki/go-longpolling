@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"../models"
+	"github.com/nhocki/go-longpolling/models"
 	"github.com/stretchr/testify/assert"
 )
 
