@@ -62,7 +62,7 @@ func (s *server) publishHanlder(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Message sent!")))
 }
 
-// publishHanlder is the HTTP handler publish messages to a channel
+// indexHandler will serve the index.html file
 func (s *server) indexHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadFile("index.html")
 	if err != nil {
