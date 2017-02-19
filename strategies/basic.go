@@ -76,7 +76,8 @@ func (b *Basic) Publish(channel string, r io.Reader) error {
 	return nil
 }
 
-func (b *Basic) totalSubs(channel string) int {
+// TotalSubs returns the number of subscribers in a channel
+func (b *Basic) TotalSubs(channel string) int {
 	b.Lock()
 	defer b.Unlock()
 	return len(b.subs[channel])

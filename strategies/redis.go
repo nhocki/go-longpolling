@@ -16,7 +16,7 @@ import (
 type Redis struct {
 	*client.PubSubConn
 
-	b   *Basic
+	b   Strategy
 	cnf *redis.Config
 }
 
@@ -57,7 +57,7 @@ func (r *Redis) Remove(uuid, channel string) error {
 		return err
 	}
 
-	if r.b.totalSubs(channel) == 0 {
+	if r.TotalSubs(channel) == 0 {
 		return r.Unsubscribe(channel)
 	}
 
@@ -74,6 +74,11 @@ func (r *Redis) Publish(channel string, rc io.Reader) error {
 	log.Printf("[redis] Publishing to %s: %s", channel, str)
 	c.Do("PUBLISH", channel, str)
 	return c.Close()
+}
+
+// TotalSubs returns the number of subscribers in a channel
+func (r *Redis) TotalSubs(channel string) int {
+	return r.b.TotalSubs(channel)
 }
 
 func (r *Redis) receive() {
