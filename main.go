@@ -11,7 +11,6 @@ import (
 	"os"
 
 	"./models"
-	"./redis"
 	"./strategies"
 )
 
@@ -96,14 +95,14 @@ func main() {
 		serverAddress = os.Args[1]
 	}
 
-	strategy, err := strategies.NewRedisStrategy(redis.ConfigFromEnv())
-	if err != nil {
-		panic(err)
-	}
+	// strategy, err := strategies.NewRedisStrategy(redis.ConfigFromEnv())
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	s := server{
 		log:      models.StdLogger,
-		Strategy: strategy,
+		Strategy: strategies.NewStdBasic(),
 		Address:  serverAddress,
 	}
 
