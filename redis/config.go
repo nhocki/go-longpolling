@@ -1,7 +1,6 @@
 package redis
 
 import (
-	"net/url"
 	"os"
 	"time"
 )
@@ -30,18 +29,6 @@ func ConfigFromEnv() *Config {
 	if redisURL == "" {
 		redisURL = "127.0.0.1:6379"
 	}
-
-	srvURL, err := url.Parse(redisURL)
-	if err != nil {
-		panic("[ERROR] Could not parse REDIS_URL: " + redisURL)
-	}
-
-	if srvURL.User == nil {
-		config.ServerURL = srvURL.String()
-	} else {
-		config.ServerURL = srvURL.Host
-		config.Auth, _ = srvURL.User.Password()
-	}
-
+	config.ServerURL = redisURL
 	return config
 }
