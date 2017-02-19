@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"log"
 
 	"github.com/nhocki/go-longpolling/models"
 	"github.com/nhocki/go-longpolling/redis"
@@ -70,7 +69,7 @@ func (r *Redis) Publish(channel string, rc io.Reader) error {
 		return err
 	}
 	str := readAll(rc)
-	log.Printf("[redis] Publishing to %s: %s", channel, str)
+	r.cnf.Log.Printf("[redis] Publishing to %s: %s", channel, str)
 	c.Do("PUBLISH", channel, str)
 	return c.Close()
 }
@@ -84,12 +83,12 @@ func (r *Redis) receive() {
 	for {
 		switch v := r.PubSubConn.Receive().(type) {
 		case client.Message:
-			log.Printf("[redis] Received on channel %s: %s", v.Channel, string(v.Data))
+			r.cnf.Log.Printf("[redis] Received on channel %s: %s", v.Channel, string(v.Data))
 			r.b.Publish(v.Channel, bytes.NewReader(v.Data))
 		case client.Subscription:
 			// Do nothing
 		case error:
-			log.Println("error pub/sub on connection, delivery has stopped")
+			r.cnf.Log.Printf("error pub/sub on connection, delivery has stopped\n")
 			return
 		}
 	}

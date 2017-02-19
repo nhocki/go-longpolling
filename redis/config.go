@@ -1,9 +1,10 @@
 package redis
 
 import (
-	"net/url"
 	"os"
 	"time"
+
+	"github.com/nhocki/go-longpolling/models"
 )
 
 var (
@@ -19,29 +20,22 @@ const (
 // Config holds the redis configuration
 type Config struct {
 	ServerURL, Auth string
+	Log             models.Logger
 }
 
 // ConfigFromEnv returns a config objects that reads everything from the
 // environment and adds some sensible defaults.
-func ConfigFromEnv() *Config {
-	config := &Config{}
+func ConfigFromEnv(l models.Logger) *Config {
+	if l == nil {
+		l = models.StdLogger
+	}
+
+	config := &Config{Log: l}
 
 	redisURL := os.Getenv("REDIS_URL")
 	if redisURL == "" {
 		redisURL = "127.0.0.1:6379"
 	}
-
-	srvURL, err := url.Parse(redisURL)
-	if err != nil {
-		panic("[ERROR] Could not parse REDIS_URL: " + redisURL)
-	}
-
-	if srvURL.User == nil {
-		config.ServerURL = srvURL.String()
-	} else {
-		config.ServerURL = srvURL.Host
-		config.Auth, _ = srvURL.User.Password()
-	}
-
+	config.ServerURL = redisURL
 	return config
 }
