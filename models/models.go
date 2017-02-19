@@ -1,10 +1,9 @@
 package models
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
-
-	"io/ioutil"
 
 	uuid "github.com/satori/go.uuid"
 )
