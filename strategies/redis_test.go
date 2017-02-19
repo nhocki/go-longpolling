@@ -10,9 +10,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newRedisStrategy(t *testing.T) *Redis {
+	cnf := redis.ConfigFromEnv(models.NullLogger)
+	conn, err := redis.NewPubSub(cnf)
+	if err != nil {
+		assert.Fail(t, "Error! %s", err)
+		return nil
+	}
+
+	return &Redis{
+		b:          &Basic{log: models.NullLogger},
+		cnf:        cnf,
+		PubSubConn: conn,
+	}
+}
+
 func TestSingleRedisStrategy(t *testing.T) {
-	strategy, err := NewRedisStrategy(redis.ConfigFromEnv())
-	assert.NoError(t, err)
+	strategy := newRedisStrategy(t)
+	assert.NotNil(t, strategy)
 	strategy.Setup()
 
 	events := models.NewConnection()
@@ -50,11 +65,11 @@ func TestSingleRedisStrategy(t *testing.T) {
 }
 
 func TestMultipleRedisStrategy(t *testing.T) {
-	publisher, err := NewRedisStrategy(redis.ConfigFromEnv())
-	assert.NoError(t, err)
+	publisher := newRedisStrategy(t)
+	assert.NotNil(t, publisher)
 
-	subscriber, err := NewRedisStrategy(redis.ConfigFromEnv())
-	assert.NoError(t, err)
+	subscriber := newRedisStrategy(t)
+	assert.NotNil(t, subscriber)
 
 	// Start subscriber listener
 	subscriber.Setup()

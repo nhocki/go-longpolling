@@ -86,7 +86,7 @@ func main() {
 		serverAddress = os.Args[1]
 	}
 
-	// strategy, err := strategies.NewRedisStrategy(redis.ConfigFromEnv())
+	// strategy, err := strategies.NewRedisStrategy(redis.ConfigFromEnv(nil))
 	// if err != nil {
 	// 	panic(err)
 	// }
